@@ -5,7 +5,7 @@ nav:
   tooltip: 关于我们
 ---
 
-# {% include icon.html icon="fa-solid fa-users" %}24 赛季团队成员
+# {% include icon.html icon="fa-solid fa-users" %}25 赛季团队成员
 {% include search-box.html %}
 {% include search-info.html %}
 历史成员请参考[历届成员](/team/history)。
