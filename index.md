@@ -1,22 +1,22 @@
 ---
 ---
 
-# 华中科技大学 狼牙战队 
+# 江苏大学 Aurora战队 
 
-华中科技大学RoboMaster团队（狼牙战队）是华中科技大学启明学院创新团队之一，是一个以参加RoboMaster机器人比赛为主，其余竞赛为辅，以培养队员全面综合水平为目标的综合型团队。
+江苏大学RoboMaster团队（Aurora战队）是江苏大学人工智能与智能制造学院创新团队之一，是一个以参加RoboMaster机器人比赛为主，其余竞赛为辅，以培养队员全面综合水平为目标的综合型团队。
 
 {%
   include button.html
   type="docs"
   text="Bilibili"
   icon="fa-brands fa-bilibili"
-  link="https://space.bilibili.com/475402455"
+  link="https://space.bilibili.com/690755074"
 %}
 {%
   include button.html
   type="github"
   text="GitHub"
-  link="HUSTLYRM"
+  link="Aurora-UJS"
 %}
 {%
   include button.html
