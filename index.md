@@ -16,7 +16,7 @@
   include button.html
   type="github"
   text="GitHub"
-  link="Aurora-UJS"
+  link="https://github.com/Aurora-UJS"
 %}
 {%
   include button.html
