@@ -24,7 +24,7 @@ nav:
 
 {%
   include feature.html
-  image="images/projects/rm/1.png"
+  image="images/projects/rm/1.jpg"
   link="projects"
   title="英雄机器人"
   flip=false
@@ -35,7 +35,7 @@ nav:
 
 
 {% capture text %}
-多种底盘结构：全向轮、舵轮、轮腿；
+多种底盘结构：全向轮、麦克纳姆轮、轮腿；
 
 FreeRTOS操作系统实现单片机伪多线程处理；
 
@@ -46,7 +46,7 @@ PID&ADRC实现云台精准控制。
 
 {%
   include feature.html
-  image="images/projects/rm/2.png"
+  image="images/projects/rm/2.jpg"
   link="projects"
   title="步兵机器人"
   flip=true
@@ -65,7 +65,7 @@ PID&ADRC实现云台精准控制。
 
 {%
   include feature.html
-  image="images/projects/rm/3.png"
+  image="images/projects/rm/3.jpg"
   link="projects"
   title="哨兵机器人"
   flip=false
@@ -84,7 +84,7 @@ PID&ADRC实现云台精准控制。
 
 {%
   include feature.html
-  image="images/projects/rm/4.png"
+  image="images/projects/rm/4.jpg"
   link="projects"
   title="工程机器人"
   flip=true
@@ -104,7 +104,7 @@ Gidance视觉定位稳定悬停，非线性预测，飞控通道映射，助力�
 
 {%
   include feature.html
-  image="images/projects/rm/5.png"
+  image="images/projects/rm/5.jpg"
   link="projects"
   title="空中机器人"
   flip=false
@@ -121,7 +121,7 @@ Gidance视觉定位稳定悬停，非线性预测，飞控通道映射，助力�
 
 {%
   include feature.html
-  image="images/projects/rm/6.png"
+  image="images/projects/rm/6.jpg"
   link="projects"
   title="飞镖机器人"
   flip=true
@@ -137,7 +137,7 @@ Gidance视觉定位稳定悬停，非线性预测，飞控通道映射，助力�
 
 {%
   include feature.html
-  image="images/projects/rm/7.png"
+  image="images/projects/rm/7.jpg"
   link="projects"
   title="雷达机器人"
   flip=false
