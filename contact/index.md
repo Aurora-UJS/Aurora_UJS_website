@@ -7,10 +7,10 @@ nav:
 
 # {% include icon.html icon="fa-regular fa-envelope" %}联系我们
 
-狼牙战队欢迎所有热爱机器人的同学加入！
+Aurora战队欢迎所有热爱机器人的同学加入！
 
-湖北省武汉市洪山区珞喻路 1037 号
-华中科技大学智能互联网湖北省重点实验室
+江苏省镇江市京口区象山街道学府路 301 号
+江苏大学人工智能与智能制造学院 A407
 
 {%
   include button.html
