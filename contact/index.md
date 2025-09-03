@@ -15,17 +15,17 @@ Aurora战队欢迎所有热爱机器人的同学加入！
 {%
   include button.html
   type="email"
-  text="hustrobomaster@163.com"
-  link="hustrobomaster@163.com"
+  text="3189928615@qq.com"
+  link="3189928615@qq.com"
 %}
 
 {%
   include button.html
   type="address"
   tooltip="我们实验室的地址"
-  link="https://surl.amap.com/1vpaONXCHaR5"
+  link="https://surl.amap.com/eAvkia7Q9Hw"
 %}
 
 {% include section.html %}
 
-企业赞助或合作事务洽谈，请联系微信：bao1037rm。
+企业赞助或合作事务洽谈，请联系微信：sxtc0523。
