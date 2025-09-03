@@ -111,7 +111,7 @@
 
 {% capture text %}
 
-我们活跃于各种社会活动，积极展现狼牙风采。
+我们活跃于各种社会活动，积极展现Aurora风采。
 
 {%
   include button.html

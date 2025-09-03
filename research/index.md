@@ -8,7 +8,7 @@ nav:
 # {% include icon.html icon="fa-solid fa-microscope" %}我们的成果
 
 ## 历史成绩
-狼牙战队是一个以参加RoboMaster机器人比赛为主，其余竞赛为辅，以培养队员全面综合水平目标的综合型团队。
+Aurora战队是一个以参加RoboMaster机器人比赛为主，其余竞赛为辅，以培养队员全面综合水平目标的综合型团队。
 
 * 20年；
 * 21年；
