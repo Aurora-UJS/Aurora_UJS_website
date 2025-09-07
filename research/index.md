@@ -122,7 +122,7 @@ option && myChart.setOption(option);
 
 {% assign awards_count =  national_awards_count | plus: international_awards_count | plus: provincial_awards_count | plus: other_awards_count %}
 
-根据不完全统计，狼牙战队已经获得了总计 {{awards_count}} 项奖项。
+根据不完全统计，Aurora战队已经获得了总计 {{awards_count}} 项奖项。
 <!-- <table>
 <tr>
   <td>国家级奖项</td>
