@@ -6,10 +6,12 @@ import time
 # 假设这是从文件或API获取的JSON数据，从url
 # https://rm-static.djicdn.com/live_json/schedule.json
 # json_data = requests.get("https://schedule.scutbot.cn/api/schedule").json()
-json_data = json.loads(open('schedule.json').read())
+json_data = json.loads(open("schedule.json").read())
 # matches_ = json_data["data"]["last_event"]["zones"]["nodes"]
 
-video_data = requests.get("https://rm-static.djicdn.com/live_json/simple_cms.json").json()
+video_data = requests.get(
+    "https://rm-static.djicdn.com/live_json/simple_cms.json"
+).json()
 
 target_college = "华中科技大学"
 
@@ -46,7 +48,7 @@ saved_matches = []
 #                     saved_match["video"] = video["content"]["main_source_url"]
 #                     break
 
-#             saved_matches.append(saved_match) 
+#             saved_matches.append(saved_match)
 #     for game in match["groupMatches"]["nodes"]:
 #         saved_match = {}
 #         if game["blueSide"]["player"]["team"]["collegeName"] == target_college or game["redSide"]["player"]["team"]["collegeName"] == target_college:
@@ -74,19 +76,25 @@ saved_matches = []
 
 #     # break
 #     # if saved_match:
-        
+
 
 matches_ = json_data["data"]["event"]["zones"]["nodes"]
 for match in matches_:
     for game in match["groupMatches"]["nodes"]:
         saved_match = {}
         print(game)
-        if game['status'] == 'WAITING':
+        if game["status"] == "WAITING":
             continue
-        if not game["blueSide"]["player"]["team"] or not game["redSide"]["player"]["team"]:
+        if (
+            not game["blueSide"]["player"]["team"]
+            or not game["redSide"]["player"]["team"]
+        ):
             continue
-        if game["blueSide"]["player"]["team"]["collegeName"] == target_college or game["redSide"]["player"]["team"]["collegeName"] == target_college:
-        #    print(game)
+        if (
+            game["blueSide"]["player"]["team"]["collegeName"] == target_college
+            or game["redSide"]["player"]["team"]["collegeName"] == target_college
+        ):
+            #    print(game)
             saved_match["blueSide"] = game["blueSide"]
             saved_match["redSide"] = game["redSide"]
             saved_match["redSideWinGameCount"] = game["redSideWinGameCount"]
@@ -108,15 +116,21 @@ for match in matches_:
                     saved_match["video"] = video["content"]["main_source_url"]
                     break
 
-            saved_matches.append(saved_match)  
+            saved_matches.append(saved_match)
     for game in match["knockoutMatches"]["nodes"]:
         saved_match = {}
         if not game["blueSide"]["player"] or not game["redSide"]["player"]:
-            continue 
-        if not game["blueSide"]["player"]["team"] or not game["redSide"]["player"]["team"]:
             continue
-        if game["blueSide"]["player"]["team"]["collegeName"] == target_college or game["redSide"]["player"]["team"]["collegeName"] == target_college:
-        #    print(game)
+        if (
+            not game["blueSide"]["player"]["team"]
+            or not game["redSide"]["player"]["team"]
+        ):
+            continue
+        if (
+            game["blueSide"]["player"]["team"]["collegeName"] == target_college
+            or game["redSide"]["player"]["team"]["collegeName"] == target_college
+        ):
+            #    print(game)
             saved_match["blueSide"] = game["blueSide"]
             saved_match["redSide"] = game["redSide"]
             saved_match["redSideWinGameCount"] = game["redSideWinGameCount"]
@@ -138,22 +152,10 @@ for match in matches_:
                     saved_match["video"] = video["content"]["main_source_url"]
                     break
 
-            saved_matches.append(saved_match)  
+            saved_matches.append(saved_match)
 
 print(len(saved_matches))
 
-# 保存到文件
-# ---
-# name: 小组赛
-# red: 华中科技大学 狼牙
-# blue: 西安交通大学 笃行
-# red_score: 2
-# red_logo: /images/1525675209294-logo_blue_800x800.png
-# blue_score: 0
-# blue_logo: /images/1525666415627-logo_red_800x800.png
-# date: 2025-3-14 15:40
-# link: https://www.robomaster.com/live?djifrom=nav
-# ---
 
 for match in saved_matches:
     file_name = f"_events/{match['name']}.md"
@@ -170,11 +172,14 @@ for match in saved_matches:
             link = "https://www.robomaster.com/live?djifrom=nav"
         # 将比赛时间+8小时
         # 2019-05-25T01:30:00Z
-        match_time = time.mktime(time.strptime(match["planStartedAt"], "%Y-%m-%dT%H:%M:%SZ"))
+        match_time = time.mktime(
+            time.strptime(match["planStartedAt"], "%Y-%m-%dT%H:%M:%SZ")
+        )
         match_time += 8 * 3600
         match_time_str = time.strftime("%Y-%m-%d %H:%M", time.localtime(match_time))
         # match_time = time.localtime(match_time)
-        f.write(f"""---
+        f.write(
+            f"""---
 name: {match['name']}
 red: {match['redSide']['player']['team']['collegeName']} {match['redSide']['player']['team']['name']}
 blue: {match['blueSide']['player']['team']['collegeName']} {match['blueSide']['player']['team']['name']}
@@ -185,5 +190,5 @@ blue_logo: {match['blueSide']['player']['team']['collegeLogo']}
 date: {match_time_str}
 link: https://www.robomaster.com/zh-CN/resource/video?type=live-replay&videoUrl={link}&zoneType=548
 ---
-""")
-        
+"""
+        )
