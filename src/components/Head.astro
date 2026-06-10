@@ -1,0 +1,83 @@
+---
+import { site } from "../data/site";
+import { asset } from "../lib/utils";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: boolean;
+}
+const {
+  title,
+  description = site.description,
+  image = site.ogImage,
+  article = false,
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${site.title}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(asset(image), Astro.site).href;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<link rel="icon" type="image/svg+xml" href={asset("/favicon.svg")} />
+<link rel="apple-touch-icon" href={asset("/images/logo.png")} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={article ? "article" : "website"} />
+<meta property="og:site_name" content={site.title} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content="zh_CN" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<meta name="theme-color" content="#0b0f1e" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+<!-- Fonts (non-blocking; falls back to system CJK fonts immediately) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  id="font-css"
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap"
+  media="print"
+/>
+<script is:inline>
+  // Flip the font stylesheet to `all` after parse so it never blocks first paint.
+  document.getElementById("font-css")?.setAttribute("media", "all");
+</script>
+<noscript>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap"
+  />
+</noscript>
+
+<!-- No-FOUC dark-mode init: set the class before first paint -->
+<script is:inline>
+  (() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      const dark =
+        stored === "dark" ||
+        (!stored && matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.classList.toggle("dark", dark);
+    } catch {}
+  })();
+</script>

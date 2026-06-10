@@ -1,0 +1,96 @@
+---
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { asset } from "@/lib/utils";
+
+/**
+ * Alternating image + rich-text feature block used on the home page.
+ * Pass the body copy as children; `flip` swaps the image to the other side.
+ */
+interface Props {
+  title: string;
+  image: string; // public path, e.g. "/images/cheer.jpg"
+  href: string; // plain internal path, base-prefixed by <Button>
+  cta?: string;
+  eyebrow?: string;
+  icon?: string;
+  flip?: boolean;
+  class?: string;
+}
+const {
+  title,
+  image,
+  href,
+  cta = "了解更多",
+  eyebrow,
+  icon,
+  flip = false,
+  class: className = "",
+} = Astro.props;
+---
+
+<div class={`grid items-center gap-8 lg:grid-cols-2 lg:gap-16 ${className}`}>
+  <!-- image -->
+  <div class={`relative ${flip ? "lg:order-2" : ""}`}>
+    <div
+      class="group relative overflow-hidden rounded-3xl border border-slate-200/80 shadow-lg dark:border-white/10"
+    >
+      <img
+        src={asset(image)}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="aspect-[4/3] w-full object-cover transition duration-700 ease-out group-hover:scale-105"
+      />
+      <div
+        class="pointer-events-none absolute inset-0 bg-gradient-to-t from-night-950/55 via-transparent to-transparent"
+      >
+      </div>
+    </div>
+    <!-- decorative glow -->
+    <div
+      class={`pointer-events-none absolute -bottom-6 -z-10 h-40 w-40 rounded-full bg-gradient-to-br from-brand-500/30 to-aurora-violet/30 blur-3xl ${
+        flip ? "-right-6" : "-left-6"
+      }`}
+      aria-hidden="true"
+    >
+    </div>
+  </div>
+
+  <!-- text -->
+  <div class={flip ? "lg:order-1" : ""}>
+    {
+      eyebrow && (
+        <p class="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+          {eyebrow}
+        </p>
+      )
+    }
+    <h2 class="flex items-center gap-3 text-2xl font-bold sm:text-3xl">
+      {
+        icon && (
+          <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <Icon name={icon} class="size-5" />
+          </span>
+        )
+      }
+      <span>{title}</span>
+    </h2>
+
+    <div class="mt-5 text-base leading-relaxed text-slate-600 dark:text-slate-300">
+      <slot />
+    </div>
+
+    <div class="mt-7">
+      <Button
+        href={href}
+        variant="bare"
+        icon="arrow-right"
+        iconPosition="right"
+        class="font-semibold"
+      >
+        {cta}
+      </Button>
+    </div>
+  </div>
+</div>

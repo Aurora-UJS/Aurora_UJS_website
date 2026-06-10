@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Dark mode = `.dark` class on <html> (toggled by ThemeToggle).
+ * ------------------------------------------------------------------ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ *
+ * Design tokens — Aurora 战队
+ * Brand: RoboMaster red + blue. Accent: an "aurora" (极光) gradient.
+ * ------------------------------------------------------------------ */
+@theme {
+  /* brand red */
+  --color-brand-50: #fff1f1;
+  --color-brand-100: #ffdfdf;
+  --color-brand-200: #ffc5c5;
+  --color-brand-300: #ff9d9d;
+  --color-brand-400: #ff6469;
+  --color-brand-500: #f5343b;
+  --color-brand-600: #e2222a;
+  --color-brand-700: #be151c;
+  --color-brand-800: #9d161b;
+  --color-brand-900: #82181d;
+  --color-brand-950: #47070a;
+
+  /* secondary blue */
+  --color-azure-50: #eff6ff;
+  --color-azure-100: #dbeafe;
+  --color-azure-200: #bfdbfe;
+  --color-azure-300: #93c5fd;
+  --color-azure-400: #60a5fa;
+  --color-azure-500: #3b82f6;
+  --color-azure-600: #2563eb;
+  --color-azure-700: #1d4ed8;
+  --color-azure-800: #1e40af;
+  --color-azure-900: #1e3a8a;
+
+  /* aurora gradient stops */
+  --color-aurora-violet: #7c3aed;
+  --color-aurora-cyan: #06b6d4;
+  --color-aurora-emerald: #10b981;
+
+  /* deep "night sky" surface for dark mode */
+  --color-night-50: #f6f7fb;
+  --color-night-800: #11162a;
+  --color-night-900: #0b0f1e;
+  --color-night-950: #060912;
+
+  --font-sans: "Inter", system-ui, -apple-system, "PingFang SC",
+    "Microsoft YaHei", "Hiragino Sans GB", "Noto Sans SC", "Segoe UI", sans-serif;
+  --font-display: "Sora", "Inter", system-ui, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+
+  --shadow-glow: 0 0 40px -8px var(--color-brand-500);
+  --animate-aurora: aurora 14s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(-6%, -4%, 0) scale(1.05);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(6%, 4%, 0) scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Base layer
+ * ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white text-slate-700 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  .dark body {
+    @apply bg-night-950 text-slate-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-tight text-slate-900;
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4 {
+    @apply text-white;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
+  ::selection {
+    @apply bg-brand-500/30;
+  }
+
+  /* respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Reusable component classes
+ * ------------------------------------------------------------------ */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .aurora-text {
+    @apply bg-gradient-to-r from-aurora-violet via-aurora-cyan to-aurora-emerald
+      bg-clip-text text-transparent;
+  }
+
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white/80 shadow-sm
+      backdrop-blur transition duration-300
+      hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg;
+  }
+
+  .dark .card {
+    @apply border-white/10 bg-white/[0.03] hover:border-brand-500/40
+      hover:shadow-[0_8px_40px_-12px_rgba(245,52,59,0.4)];
+  }
+
+  /* Long-form content (markdown bodies) */
+  .prose-aurora {
+    @apply max-w-none leading-relaxed text-slate-700;
+  }
+  .dark .prose-aurora {
+    @apply text-slate-300;
+  }
+  .prose-aurora :where(h2) {
+    @apply mt-10 mb-4 text-2xl;
+  }
+  .prose-aurora :where(h3) {
+    @apply mt-8 mb-3 text-xl;
+  }
+  .prose-aurora :where(p) {
+    @apply my-4;
+  }
+  .prose-aurora :where(ul) {
+    @apply my-4 list-disc space-y-1 pl-6;
+  }
+  .prose-aurora :where(ol) {
+    @apply my-4 list-decimal space-y-1 pl-6;
+  }
+  .prose-aurora :where(a) {
+    @apply font-medium text-brand-600 underline decoration-brand-300
+      underline-offset-2 hover:text-brand-700;
+  }
+  .dark .prose-aurora :where(a) {
+    @apply text-brand-400 hover:text-brand-300;
+  }
+  .prose-aurora :where(img) {
+    @apply my-6 rounded-xl;
+  }
+  .prose-aurora :where(blockquote) {
+    @apply my-4 border-l-4 border-brand-400 pl-4 italic text-slate-500;
+  }
+  .dark .prose-aurora :where(blockquote) {
+    @apply border-brand-500 text-slate-400;
+  }
+  .prose-aurora :where(code):not(pre code) {
+    @apply rounded bg-slate-100 px-1.5 py-0.5 text-sm text-brand-700;
+  }
+  .dark .prose-aurora :where(code):not(pre code) {
+    @apply bg-white/10 text-brand-300;
+  }
+  .prose-aurora :where(pre) {
+    @apply my-5 overflow-x-auto rounded-xl p-4 text-sm;
+  }
+}

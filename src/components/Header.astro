@@ -1,0 +1,128 @@
+---
+import { site, nav } from "../data/site";
+import { link, asset, isActive } from "../lib/utils";
+import Icon from "./Icon.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+const current = Astro.url.pathname;
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-lg dark:border-white/10 dark:bg-night-950/80"
+>
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <!-- brand -->
+    <a
+      href={link("/")}
+      class="group flex shrink-0 items-center gap-2.5"
+      aria-label={`${site.title} 首页`}
+    >
+      <img
+        src={asset("/images/logo.png")}
+        alt=""
+        width="36"
+        height="36"
+        class="size-9 rounded-md object-contain transition group-hover:scale-105"
+      />
+      <span class="flex flex-col leading-none">
+        <span class="font-display text-lg font-bold text-slate-900 dark:text-white"
+          >Aurora <span class="aurora-text">战队</span></span
+        >
+        <span class="mt-0.5 text-[11px] tracking-wide text-slate-500 dark:text-slate-400">
+          江苏大学 RoboMaster
+        </span>
+      </span>
+    </a>
+
+    <!-- desktop nav -->
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="主导航">
+      {
+        nav.map((item) => {
+          const active = isActive(current, item.href);
+          return (
+            <a
+              href={link(item.href)}
+              title={item.tooltip}
+              aria-current={active ? "page" : undefined}
+              class:list={[
+                "rounded-full px-3.5 py-2 text-sm font-medium transition",
+                active
+                  ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white",
+              ]}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="flex items-center gap-1">
+      <a
+        href={site.links.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub"
+        class="hidden size-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white sm:inline-flex"
+      >
+        <Icon name="github" class="size-5" />
+      </a>
+      <ThemeToggle />
+      <!-- mobile toggle -->
+      <button
+        type="button"
+        id="nav-toggle"
+        class="inline-flex size-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 lg:hidden"
+        aria-label="打开菜单"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <Icon name="menu" class="size-6 [&.is-open]:hidden" />
+        <Icon name="x" class="hidden size-6 [.is-open_&]:block" />
+      </button>
+    </div>
+  </div>
+
+  <!-- mobile drawer -->
+  <nav
+    id="mobile-nav"
+    class="hidden border-t border-slate-200/70 bg-white/95 px-5 pb-4 pt-2 backdrop-blur dark:border-white/10 dark:bg-night-950/95 lg:hidden"
+    aria-label="移动端导航"
+  >
+    {
+      nav.map((item) => {
+        const active = isActive(current, item.href);
+        return (
+          <a
+            href={link(item.href)}
+            aria-current={active ? "page" : undefined}
+            class:list={[
+              "block rounded-lg px-4 py-2.5 text-base font-medium transition",
+              active
+                ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+                : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5",
+            ]}
+          >
+            {item.label}
+            <span class="ml-1 text-xs text-slate-400">{item.tooltip}</span>
+          </a>
+        );
+      })
+    }
+  </nav>
+</header>
+
+<script is:inline>
+  (() => {
+    const btn = document.getElementById("nav-toggle");
+    const menu = document.getElementById("mobile-nav");
+    if (!btn || !menu) return;
+    btn.addEventListener("click", () => {
+      const open = menu.classList.toggle("hidden") === false;
+      btn.classList.toggle("is-open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+    });
+  })();
+</script>

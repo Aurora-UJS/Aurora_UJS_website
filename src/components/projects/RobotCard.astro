@@ -1,0 +1,44 @@
+---
+import Icon from "@/components/Icon.astro";
+
+/** A single RoboMaster robot: gradient-accented icon chip + tech bullet list. */
+interface Props {
+  icon: string;
+  title: string;
+  points: string[];
+}
+const { icon, title, points } = Astro.props;
+---
+
+<article class="card group relative flex h-full flex-col overflow-hidden p-6 sm:p-7">
+  <!-- accent glow -->
+  <div
+    class="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br from-brand-500/20 to-aurora-violet/20 opacity-70 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
+  >
+  </div>
+
+  <div class="relative flex items-center gap-4">
+    <span
+      class="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500/15 to-aurora-violet/15 text-brand-600 ring-1 ring-inset ring-brand-500/20 transition-transform duration-300 group-hover:scale-105 dark:text-brand-400 dark:ring-brand-500/25"
+    >
+      <Icon name={icon} class="size-7" />
+    </span>
+    <h3 class="font-display text-xl font-bold text-slate-900 dark:text-white">
+      {title}
+    </h3>
+  </div>
+
+  <ul class="relative mt-5 space-y-3">
+    {
+      points.map((p) => (
+        <li class="flex gap-2.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <Icon
+            name="chevron-right"
+            class="mt-0.5 size-4 shrink-0 text-brand-500/80 dark:text-brand-400/80"
+          />
+          <span>{p}</span>
+        </li>
+      ))
+    }
+  </ul>
+</article>

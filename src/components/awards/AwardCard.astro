@@ -1,0 +1,145 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { medalTier, formatYearMonth, link } from "@/lib/utils";
+import Icon from "@/components/Icon.astro";
+
+interface Props {
+  /** An entry from the `awards` collection. */
+  award: CollectionEntry<"awards">;
+  /** Ids (Chinese names) of members that actually have a detail page. */
+  memberIds?: Set<string>;
+}
+const { award, memberIds } = Astro.props;
+const { name, type, prize, date, members, detail } = award.data;
+
+const typeName = (type ?? "").trim();
+const tier = medalTier(prize);
+
+const tierStyles: Record<
+  string,
+  { bar: string; badge: string; label: string; icon: string }
+> = {
+  gold: {
+    bar: "bg-gradient-to-b from-amber-300 to-amber-500",
+    badge:
+      "bg-amber-100 text-amber-700 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25",
+    label: "金奖级",
+    icon: "trophy",
+  },
+  silver: {
+    bar: "bg-gradient-to-b from-slate-300 to-slate-400",
+    badge:
+      "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-white/10 dark:text-slate-200 dark:ring-white/15",
+    label: "银奖级",
+    icon: "medal",
+  },
+  bronze: {
+    bar: "bg-gradient-to-b from-amber-600 to-amber-800",
+    badge:
+      "bg-amber-700/10 text-amber-800 ring-amber-700/20 dark:bg-amber-700/15 dark:text-amber-500 dark:ring-amber-700/30",
+    label: "铜奖级",
+    icon: "medal",
+  },
+  none: {
+    bar: "bg-gradient-to-b from-slate-200 to-slate-300 dark:from-white/10 dark:to-white/[0.04]",
+    badge:
+      "bg-slate-100 text-slate-500 ring-slate-200 dark:bg-white/5 dark:text-slate-400 dark:ring-white/10",
+    label: "参赛奖",
+    icon: "sparkles",
+  },
+};
+const ts = tierStyles[tier];
+
+const typeStyles: Record<string, string> = {
+  国际级:
+    "bg-aurora-violet/10 text-aurora-violet ring-aurora-violet/20 dark:bg-aurora-violet/15 dark:text-violet-300 dark:ring-aurora-violet/30",
+  国家级:
+    "bg-brand-50 text-brand-600 ring-brand-200 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-500/25",
+  省级:
+    "bg-azure-50 text-azure-700 ring-azure-200 dark:bg-azure-500/10 dark:text-azure-300 dark:ring-azure-500/25",
+};
+const typeBadge =
+  typeStyles[typeName] ??
+  "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10";
+
+const memberList = members ?? [];
+const dateLabel = formatYearMonth(date);
+const badgeBase =
+  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset";
+---
+
+<article class="card group relative flex flex-col overflow-hidden p-5 pl-6 sm:p-6 sm:pl-7">
+  <span class={`absolute inset-y-0 left-0 w-1.5 ${ts.bar}`} aria-hidden="true"></span>
+
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+      {
+        typeName && typeName !== "其他" && (
+          <span class={`${badgeBase} ${typeBadge}`}>{typeName}</span>
+        )
+      }
+      <span class={`${badgeBase} ${ts.badge}`}>
+        <Icon name={ts.icon} class="size-3.5" />
+        {ts.label}
+      </span>
+    </div>
+    {
+      dateLabel && (
+        <time class="shrink-0 pt-0.5 text-xs font-medium text-slate-400 dark:text-slate-500">
+          {dateLabel}
+        </time>
+      )
+    }
+  </div>
+
+  <h3
+    class="mt-3 font-display text-lg font-semibold leading-snug text-slate-900 transition group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400"
+  >
+    {name}
+  </h3>
+
+  {
+    prize && (
+      <p class="mt-1.5 text-sm font-medium text-slate-600 dark:text-slate-300">
+        {prize}
+      </p>
+    )
+  }
+
+  {
+    memberList.length > 0 && (
+      <div class="mt-3 flex flex-wrap items-center gap-x-1 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+        <Icon name="users" class="mr-1 size-4 shrink-0 text-slate-400" />
+        {memberList.map((m, i) => (
+          <>
+            {memberIds?.has(m) ? (
+              <a
+                href={link("/members/" + m)}
+                class="font-medium text-slate-700 underline decoration-slate-300 decoration-dotted underline-offset-2 transition hover:text-brand-600 hover:decoration-brand-400 dark:text-slate-200 dark:decoration-white/20 dark:hover:text-brand-400"
+              >
+                {m}
+              </a>
+            ) : (
+              <span>{m}</span>
+            )}
+            {i < memberList.length - 1 && (
+              <span class="text-slate-300 dark:text-slate-600">·</span>
+            )}
+          </>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    detail && (
+      <a
+        href={link("/awards/" + award.id)}
+        class="mt-4 inline-flex items-center gap-1 self-start text-sm font-semibold text-brand-600 transition hover:gap-2 dark:text-brand-400"
+      >
+        查看详情
+        <Icon name="arrow-right" class="size-4" />
+      </a>
+    )
+  }
+</article>

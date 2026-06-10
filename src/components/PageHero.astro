@@ -1,0 +1,54 @@
+---
+import Icon from "./Icon.astro";
+
+/** Standard band at the top of interior pages. */
+interface Props {
+  title: string;
+  subtitle?: string;
+  icon?: string;
+  eyebrow?: string;
+  class?: string;
+}
+const { title, subtitle, icon, eyebrow, class: className = "" } = Astro.props;
+---
+
+<section
+  class={`relative overflow-hidden border-b border-slate-200/70 bg-slate-50 dark:border-white/10 dark:bg-night-900 ${className}`}
+>
+  <div
+    class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-brand-500/20 to-aurora-violet/20 blur-3xl"
+  >
+  </div>
+  <div
+    class="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-aurora-cyan/20 to-aurora-emerald/20 blur-3xl"
+  >
+  </div>
+
+  <div class="container-page relative py-14 sm:py-16">
+    {
+      eyebrow && (
+        <p class="mb-3 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+          {eyebrow}
+        </p>
+      )
+    }
+    <h1 class="flex items-center gap-3 text-3xl font-bold sm:text-4xl">
+      {
+        icon && (
+          <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <Icon name={icon} class="size-6" />
+          </span>
+        )
+      }
+      <span>{title}</span>
+    </h1>
+    {
+      subtitle && (
+        <p class="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+          {subtitle}
+        </p>
+      )
+    }
+    <slot />
+  </div>
+</section>

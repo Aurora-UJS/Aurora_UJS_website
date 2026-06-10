@@ -1,0 +1,197 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Icon from "@/components/Icon.astro";
+import Button from "@/components/Button.astro";
+import { asset, formatDateTime } from "@/lib/utils";
+
+/** A single RoboMaster match scoreboard (red team vs blue team). */
+interface Props {
+  event: CollectionEntry<"events">;
+}
+const { event } = Astro.props;
+const { data } = event;
+
+// Remote logos with a graceful onerror fallback to the bundled placeholder.
+const fallback = asset("/images/fallback.svg");
+const redLogo = data.red_logo || fallback;
+const blueLogo = data.blue_logo || fallback;
+const onErr = `this.onerror=null;this.src='${fallback}'`;
+
+// Which side is 江苏大学 / Aurora on (if any)?
+const isAurora = (s: string) => /aurora|江苏大学/i.test(s);
+const auroraSide: "red" | "blue" | null = isAurora(data.red)
+  ? "red"
+  : isAurora(data.blue)
+    ? "blue"
+    : null;
+
+const redWon = data.red_score > data.blue_score;
+const blueWon = data.blue_score > data.red_score;
+
+// Aurora's result, from the side it played on.
+let result: "win" | "lose" | "draw" | null = null;
+if (auroraSide) {
+  const own = auroraSide === "red" ? data.red_score : data.blue_score;
+  const opp = auroraSide === "red" ? data.blue_score : data.red_score;
+  result = own > opp ? "win" : own < opp ? "lose" : "draw";
+}
+
+const resultMeta = {
+  win: {
+    label: "Aurora 告捷",
+    icon: "trophy",
+    cls: "bg-aurora-emerald/15 text-aurora-emerald ring-1 ring-inset ring-aurora-emerald/30",
+  },
+  lose: {
+    label: "Aurora 惜败",
+    icon: "heart-crack",
+    cls: "bg-slate-500/10 text-slate-600 ring-1 ring-inset ring-slate-400/20 dark:bg-white/10 dark:text-slate-300 dark:ring-white/10",
+  },
+  draw: {
+    label: "Aurora 战平",
+    icon: "swords",
+    cls: "bg-amber-500/15 text-amber-600 ring-1 ring-inset ring-amber-500/25 dark:text-amber-400",
+  },
+} as const;
+---
+
+<article class="card overflow-hidden">
+  <!-- header: match name + date + Aurora result -->
+  <header
+    class="flex flex-col gap-3 border-b border-slate-200/70 px-5 py-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="min-w-0">
+      <h3 class="truncate text-base font-semibold sm:text-lg">{data.name}</h3>
+      <p
+        class="mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400"
+      >
+        <Icon name="calendar" class="size-4 shrink-0" />
+        <time>{formatDateTime(data.date)}</time>
+      </p>
+    </div>
+    {
+      result && (
+        <span
+          class={`inline-flex shrink-0 items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs font-semibold ${resultMeta[result].cls}`}
+        >
+          <Icon name={resultMeta[result].icon} class="size-3.5" />
+          {resultMeta[result].label}
+        </span>
+      )
+    }
+  </header>
+
+  <!-- battle: red panel | VS | blue panel -->
+  <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr]">
+    <!-- RED -->
+    <div
+      class="relative flex flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 px-6 py-9 text-center text-white"
+    >
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(255,255,255,0.2),transparent_55%)]"
+      >
+      </div>
+      {
+        redWon && (
+          <span class="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide backdrop-blur">
+            <Icon name="trophy" class="size-3" />胜
+          </span>
+        )
+      }
+      <div class="relative z-10 flex flex-col items-center gap-3">
+        <div
+          class="flex size-16 items-center justify-center rounded-full bg-white p-2 shadow-md ring-1 ring-white/40 sm:size-20"
+        >
+          <img
+            src={redLogo}
+            alt={data.red}
+            onerror={onErr}
+            width="64"
+            height="64"
+            loading="lazy"
+            class="size-full rounded-full object-contain"
+          />
+        </div>
+        <p
+          class="max-w-[12rem] text-sm font-semibold leading-snug sm:text-base"
+        >
+          {data.red}
+        </p>
+        <p
+          class={`font-display text-4xl font-extrabold tabular-nums sm:text-5xl ${blueWon ? "text-white/60" : ""}`}
+        >
+          {data.red_score}
+        </p>
+      </div>
+    </div>
+
+    <!-- VS divider -->
+    <div
+      class="flex items-center justify-center bg-gradient-to-r from-brand-600 to-azure-600 px-4 py-3 sm:px-3 sm:py-4"
+    >
+      <span
+        class="flex size-12 items-center justify-center rounded-full bg-white font-display text-sm font-extrabold tracking-wider text-slate-900 shadow-lg ring-2 ring-white/60 dark:bg-night-900 dark:text-white"
+        >VS</span
+      >
+    </div>
+
+    <!-- BLUE -->
+    <div
+      class="relative flex flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-bl from-azure-500 via-azure-600 to-azure-700 px-6 py-9 text-center text-white"
+    >
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_75%_15%,rgba(255,255,255,0.2),transparent_55%)]"
+      >
+      </div>
+      {
+        blueWon && (
+          <span class="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide backdrop-blur">
+            <Icon name="trophy" class="size-3" />胜
+          </span>
+        )
+      }
+      <div class="relative z-10 flex flex-col items-center gap-3">
+        <div
+          class="flex size-16 items-center justify-center rounded-full bg-white p-2 shadow-md ring-1 ring-white/40 sm:size-20"
+        >
+          <img
+            src={blueLogo}
+            alt={data.blue}
+            onerror={onErr}
+            width="64"
+            height="64"
+            loading="lazy"
+            class="size-full rounded-full object-contain"
+          />
+        </div>
+        <p
+          class="max-w-[12rem] text-sm font-semibold leading-snug sm:text-base"
+        >
+          {data.blue}
+        </p>
+        <p
+          class={`font-display text-4xl font-extrabold tabular-nums sm:text-5xl ${redWon ? "text-white/60" : ""}`}
+        >
+          {data.blue_score}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- replay -->
+  {
+    data.link && (
+      <footer class="flex justify-center border-t border-slate-200/70 px-5 py-4 dark:border-white/10">
+        <Button
+          href={data.link}
+          variant="outline"
+          size="sm"
+          icon="play-circle"
+          newTab
+        >
+          观看回放
+        </Button>
+      </footer>
+    )
+  }
+</article>

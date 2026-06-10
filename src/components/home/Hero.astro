@@ -1,0 +1,129 @@
+---
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { asset } from "@/lib/utils";
+import { site } from "@/data/site";
+
+/**
+ * Full-bleed landing hero — muted autoplay video background with an animated
+ * aurora glow, dark night overlay and white foreground copy. The video is
+ * hidden under prefers-reduced-motion, revealing the static poster image.
+ */
+const poster = asset("/images/background.jpg");
+const video = asset("/images/bgvideo.mp4");
+
+const outlineDark =
+  "!border-white/40 !text-white hover:!border-white hover:!bg-white/10 hover:!text-white";
+---
+
+<section
+  class="relative isolate flex min-h-[88vh] items-center overflow-hidden bg-night-950 text-white"
+>
+  <!-- base poster / reduced-motion fallback -->
+  <div
+    class="absolute inset-0 -z-30 bg-cover bg-center"
+    style={`background-image:url('${poster}')`}
+    aria-hidden="true"
+  >
+  </div>
+
+  <!-- looping background video (hidden when motion is reduced) -->
+  <video
+    class="absolute inset-0 -z-20 h-full w-full object-cover motion-reduce:hidden"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster={poster}
+    aria-hidden="true"
+  >
+    <source src={video} type="video/mp4" />
+  </video>
+
+  <!-- dark night overlay -->
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-b from-night-950/85 via-night-950/65 to-night-950/95"
+    aria-hidden="true"
+  >
+  </div>
+
+  <!-- animated aurora glow -->
+  <div
+    class="pointer-events-none absolute inset-0 -z-[5] overflow-hidden"
+    aria-hidden="true"
+  >
+    <div
+      class="absolute left-1/2 top-[-12%] h-[55vh] w-[72vw] -translate-x-1/2 rounded-full bg-gradient-to-r from-aurora-violet/40 via-aurora-cyan/30 to-aurora-emerald/40 blur-[120px] animate-aurora"
+    >
+    </div>
+    <div
+      class="absolute -bottom-[15%] right-[8%] h-[42vh] w-[42vw] rounded-full bg-gradient-to-tr from-brand-600/35 to-aurora-violet/20 blur-[110px] animate-float"
+    >
+    </div>
+  </div>
+
+  <!-- content -->
+  <div
+    class="container-page relative z-10 flex flex-col items-center py-28 text-center sm:py-32"
+  >
+    <span
+      class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur sm:text-sm"
+    >
+      <Icon name="sparkles" class="size-4 text-aurora-cyan" />
+      RoboMaster · 综合型机器人战队
+    </span>
+
+    <h1
+      class="mt-7 font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl"
+    >
+      江苏大学 <span class="aurora-text">Aurora</span> 战队
+    </h1>
+
+    <p
+      class="mt-6 font-display text-xl font-semibold tracking-wide text-white/90 sm:text-2xl"
+    >
+      「{site.slogan}」
+    </p>
+
+    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-200/90 sm:text-lg">
+      {site.org}创新团队 —— 以 RoboMaster 机器人比赛为主、其余竞赛为辅，多学科交叉融合、
+      以培养队员全面综合水平为目标的综合型战队。
+    </p>
+
+    <div
+      class="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
+    >
+      <Button href={site.links.bilibili} icon="bilibili" size="lg">
+        Bilibili
+      </Button>
+      <Button
+        href={site.links.github}
+        icon="github"
+        variant="outline"
+        size="lg"
+        class={outlineDark}
+      >
+        GitHub
+      </Button>
+      <Button
+        href={site.links.wechat}
+        icon="wechat"
+        variant="outline"
+        size="lg"
+        class={outlineDark}
+      >
+        微信公众号
+      </Button>
+    </div>
+  </div>
+
+  <!-- scroll-down cue -->
+  <a
+    href="#explore"
+    aria-label="向下滚动"
+    class="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 rounded-full p-2 text-white/70 transition hover:text-white sm:block"
+  >
+    <Icon name="chevron-down" class="size-7 animate-bounce" />
+  </a>
+</section>

@@ -1,0 +1,159 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Icon from "@/components/Icon.astro";
+import { link, asset, isExternal } from "@/lib/utils";
+
+/**
+ * Portrait card for a single team member.
+ * The whole card links to the member's detail page (via a stretched overlay
+ * link), while the small social links stay independently clickable on top.
+ * Member portrait photos may not exist → fall back to a gradient-initial avatar.
+ */
+interface Props {
+  entry: CollectionEntry<"members">;
+  size?: "default" | "small" | "tiny";
+}
+const { entry, size = "default" } = Astro.props;
+const m = entry.data;
+
+const detailUrl = link(`/members/${entry.id}`);
+const hasImage = !!(m.image && String(m.image).trim());
+const initial = (m.name ?? "?").trim().charAt(0) || "?";
+
+// Social links — skip empty/null values (member data often has blank strings).
+const socialDefs = [
+  { key: "github", icon: "github", label: "GitHub", mailto: false },
+  { key: "home-page", icon: "link", label: "个人主页", mailto: false },
+  { key: "bilibili", icon: "bilibili", label: "Bilibili", mailto: false },
+  { key: "email", icon: "mail", label: "邮箱", mailto: true },
+] as const;
+const links = (m.links ?? {}) as Record<string, string | null | undefined>;
+const socials = socialDefs
+  .map((d) => ({ ...d, raw: links[d.key] }))
+  .filter((d) => d.raw && String(d.raw).trim())
+  .map((d) => ({
+    ...d,
+    href: d.mailto
+      ? String(d.raw).startsWith("mailto:")
+        ? String(d.raw)
+        : `mailto:${d.raw}`
+      : String(d.raw),
+  }));
+
+const conf = {
+  default: {
+    pad: "p-5",
+    avatar: "size-20",
+    initialText: "text-2xl",
+    name: "text-base",
+    showType: true,
+    showRole: true,
+    showAff: true,
+    showGrade: true,
+    showLinks: true,
+  },
+  small: {
+    pad: "p-4",
+    avatar: "size-16",
+    initialText: "text-xl",
+    name: "text-sm",
+    showType: true,
+    showRole: true,
+    showAff: false,
+    showGrade: true,
+    showLinks: true,
+  },
+  tiny: {
+    pad: "p-3",
+    avatar: "size-12",
+    initialText: "text-base",
+    name: "text-sm",
+    showType: false,
+    showRole: false,
+    showAff: false,
+    showGrade: false,
+    showLinks: false,
+  },
+}[size];
+---
+
+<div class={`card group relative flex flex-col items-center text-center ${conf.pad}`}>
+  <!-- stretched overlay link → whole card is clickable -->
+  <a
+    href={detailUrl}
+    class="absolute inset-0 z-10 rounded-2xl"
+    aria-label={`查看 ${m.name} 的主页`}></a>
+
+  {
+    hasImage ? (
+      <img
+        src={asset(m.image!)}
+        alt={m.name}
+        loading="lazy"
+        class={`${conf.avatar} shrink-0 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-white/10`}
+      />
+    ) : (
+      <div
+        aria-hidden="true"
+        class={`${conf.avatar} flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 via-aurora-violet to-aurora-cyan font-display ${conf.initialText} font-bold text-white shadow-sm ring-2 ring-white dark:ring-white/10`}
+      >
+        {initial}
+      </div>
+    )
+  }
+
+  <h3
+    class={`mt-3 ${conf.name} font-semibold text-slate-900 transition-colors group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400`}
+  >
+    {m.name}
+  </h3>
+
+  {
+    conf.showType && m.type && (
+      <span class="mt-1.5 inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+        {m.type}
+      </span>
+    )
+  }
+
+  {
+    conf.showRole && m.role && (
+      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">{m.role}</p>
+    )
+  }
+
+  {
+    conf.showAff && m.affiliation && (
+      <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+        {m.affiliation}
+      </p>
+    )
+  }
+
+  {
+    conf.showGrade && m.grade && (
+      <span class="mt-2 inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+        {m.grade}级
+      </span>
+    )
+  }
+
+  {
+    conf.showLinks && socials.length > 0 && (
+      <div class="relative z-20 mt-3 flex items-center gap-1">
+        {socials.map((s) => (
+          <a
+            href={link(s.href)}
+            title={s.label}
+            aria-label={s.label}
+            target={isExternal(s.href) && !s.mailto ? "_blank" : undefined}
+            rel={isExternal(s.href) && !s.mailto ? "noopener noreferrer" : undefined}
+            class="inline-flex size-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/10 dark:hover:text-brand-400"
+          >
+            <Icon name={s.icon} class="size-4" />
+          </a>
+        ))}
+      </div>
+    )
+  }
+</div>
