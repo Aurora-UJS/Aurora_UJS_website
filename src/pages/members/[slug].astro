@@ -1,0 +1,198 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { link, asset, isExternal, formatYear, medalTier } from "@/lib/utils";
+
+export async function getStaticPaths() {
+  const members = await getCollection("members");
+  return members.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const m = entry.data;
+const { Content } = await render(entry);
+const hasBio = !!(entry.body && entry.body.trim());
+
+const hasImage = !!(m.image && String(m.image).trim());
+const initial = (m.name ?? "?").trim().charAt(0) || "?";
+
+// Social links — skip empty/null values.
+const socialDefs = [
+  { key: "github", icon: "github", label: "GitHub", mailto: false },
+  { key: "home-page", icon: "link", label: "个人主页", mailto: false },
+  { key: "bilibili", icon: "bilibili", label: "Bilibili", mailto: false },
+  { key: "email", icon: "mail", label: "邮箱", mailto: true },
+] as const;
+const links = (m.links ?? {}) as Record<string, string | null | undefined>;
+const socials = socialDefs
+  .map((d) => ({ ...d, raw: links[d.key] }))
+  .filter((d) => d.raw && String(d.raw).trim())
+  .map((d) => ({
+    ...d,
+    href: d.mailto
+      ? String(d.raw).startsWith("mailto:")
+        ? String(d.raw)
+        : `mailto:${d.raw}`
+      : String(d.raw),
+  }));
+
+// Meta chips (non-name attributes).
+const chips = [
+  m.type && { label: m.type, kind: "brand" },
+  m.role && { label: m.role, kind: "slate" },
+  m.affiliation && { label: m.affiliation, kind: "slate" },
+  m.grade && { label: `${m.grade}级`, kind: "slate" },
+].filter(Boolean) as { label: string; kind: "brand" | "slate" }[];
+
+// 相关荣誉 — awards whose members list includes this member's name.
+const awards = await getCollection("awards");
+const relatedAwards = awards
+  .filter((a) => (a.data.members ?? []).includes(m.name))
+  .sort(
+    (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+  );
+
+const medalColor: Record<string, string> = {
+  gold: "text-amber-500",
+  silver: "text-slate-400",
+  bronze: "text-orange-600 dark:text-orange-400",
+  none: "text-slate-300 dark:text-slate-600",
+};
+---
+
+<BaseLayout title={m.name} description={m.description ?? `${m.name} —— Aurora 战队成员`}>
+  <!-- header band (matches PageHero palette) -->
+  <section
+    class="relative overflow-hidden border-b border-slate-200/70 bg-slate-50 dark:border-white/10 dark:bg-night-900"
+  >
+    <div
+      class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-brand-500/20 to-aurora-violet/20 blur-3xl"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-aurora-cyan/20 to-aurora-emerald/20 blur-3xl"
+    >
+    </div>
+
+    <div class="container-page relative py-14 sm:py-16">
+      <Button href="/team" variant="ghost" size="sm" icon="arrow-left">返回成员</Button>
+
+      <div class="mt-6 flex flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:text-left">
+        {
+          hasImage ? (
+            <img
+              src={asset(m.image!)}
+              alt={m.name}
+              class="size-28 shrink-0 rounded-full object-cover shadow-sm ring-4 ring-white dark:ring-white/10 sm:size-32"
+            />
+          ) : (
+            <div
+              aria-hidden="true"
+              class="flex size-28 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 via-aurora-violet to-aurora-cyan font-display text-4xl font-bold text-white shadow-sm ring-4 ring-white dark:ring-white/10 sm:size-32"
+            >
+              {initial}
+            </div>
+          )
+        }
+
+        <div class="min-w-0 flex-1">
+          <h1 class="text-3xl font-bold sm:text-4xl">{m.name}</h1>
+
+          {
+            chips.length > 0 && (
+              <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+                {chips.map((c) => (
+                  <span
+                    class={
+                      c.kind === "brand"
+                        ? "inline-flex items-center rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+                        : "inline-flex items-center rounded-full bg-white px-2.5 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10"
+                    }
+                  >
+                    {c.label}
+                  </span>
+                ))}
+              </div>
+            )
+          }
+
+          {
+            socials.length > 0 && (
+              <div class="mt-5 flex flex-wrap justify-center gap-2 sm:justify-start">
+                {socials.map((s) => (
+                  <a
+                    href={link(s.href)}
+                    title={s.label}
+                    aria-label={s.label}
+                    target={isExternal(s.href) && !s.mailto ? "_blank" : undefined}
+                    rel={isExternal(s.href) && !s.mailto ? "noopener noreferrer" : undefined}
+                    class="inline-flex size-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-brand-400 hover:text-brand-600 dark:border-white/10 dark:text-slate-400 dark:hover:border-brand-500/50 dark:hover:text-brand-400"
+                  >
+                    <Icon name={s.icon} class="size-5" />
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Section size="narrow">
+    <!-- 简介 -->
+    <h2 class="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+      <Icon name="user" class="size-5 text-brand-600 dark:text-brand-400" />
+      个人简介
+    </h2>
+    {
+      hasBio ? (
+        <div class="prose-aurora mt-4">
+          <Content />
+        </div>
+      ) : (
+        <p class="mt-4 text-slate-500 dark:text-slate-400">该成员暂无简介。</p>
+      )
+    }
+
+    <!-- 相关荣誉 -->
+    <div class="mt-12">
+      <h2 class="flex items-center gap-2 text-xl font-bold sm:text-2xl">
+        <Icon name="trophy" class="size-5 text-brand-600 dark:text-brand-400" />
+        相关荣誉
+      </h2>
+      {
+        relatedAwards.length > 0 ? (
+          <ul class="mt-5 space-y-3">
+            {relatedAwards.map((a) => (
+              <li class="card flex items-start gap-3 p-4">
+                <span class={`mt-0.5 shrink-0 ${medalColor[medalTier(a.data.prize)]}`}>
+                  <Icon name="medal" class="size-5" />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-slate-900 dark:text-white">{a.data.name}</p>
+                  {(a.data.prize || a.data.type || a.data.date) && (
+                    <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                      {[a.data.prize, a.data.type, formatYear(a.data.date)]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">暂无相关荣誉记录。</p>
+        )
+      }
+    </div>
+
+    <div class="mt-12 border-t border-slate-200/70 pt-6 dark:border-white/10">
+      <Button href="/team" variant="outline" icon="arrow-left">返回成员</Button>
+    </div>
+  </Section>
+</BaseLayout>

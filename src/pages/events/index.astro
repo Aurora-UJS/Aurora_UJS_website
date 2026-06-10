@@ -1,0 +1,110 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import Scoreboard from "@/components/events/Scoreboard.astro";
+import { groupByYear } from "@/lib/utils";
+import { site } from "@/data/site";
+
+// Newest matches first, then bucketed by year (desc).
+const events = (await getCollection("events")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const groups = groupByYear(events, (e) => e.data.date);
+const total = events.length;
+
+// Aurora win tally (matches where 江苏大学 / Aurora actually played).
+const isAurora = (s: string) => /aurora|江苏大学/i.test(s);
+let played = 0;
+let wins = 0;
+for (const e of events) {
+  const side = isAurora(e.data.red)
+    ? "red"
+    : isAurora(e.data.blue)
+      ? "blue"
+      : null;
+  if (!side) continue;
+  played++;
+  const own = side === "red" ? e.data.red_score : e.data.blue_score;
+  const opp = side === "red" ? e.data.blue_score : e.data.red_score;
+  if (own > opp) wins++;
+}
+---
+
+<BaseLayout
+  title="历史赛程"
+  description="江苏大学 Aurora 战队历次 RoboMaster 赛事战报与比分回顾——征战赛场的每一刻。"
+>
+  <PageHero icon="swords" eyebrow="赛事战绩" title="历史赛程" subtitle="征战赛场的每一刻">
+    <div class="mt-6">
+      <Button href="/25" variant="outline" icon="play-circle">25 赛季对手对局视频</Button>
+    </div>
+    {
+      total > 0 && (
+        <div class="mt-6 flex flex-wrap gap-3">
+          <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/60 px-4 py-1.5 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
+            <Icon name="swords" class="size-4 text-brand-600 dark:text-brand-400" />
+            共 {total} 场对决
+          </span>
+          {played > 0 && (
+            <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/60 px-4 py-1.5 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
+              <Icon name="trophy" class="size-4 text-aurora-emerald" />
+              战胜 {wins} 场
+            </span>
+          )}
+        </div>
+      )
+    }
+  </PageHero>
+
+  <Section>
+    {
+      total === 0 ? (
+        <div class="mx-auto max-w-md py-10 text-center">
+          <div class="mx-auto flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500/15 to-aurora-violet/15 text-brand-600 dark:text-brand-400">
+            <Icon name="swords" class="size-9" />
+          </div>
+          <h2 class="mt-6 text-2xl font-bold">赛程更新中</h2>
+          <p class="mt-3 leading-relaxed text-slate-600 dark:text-slate-400">
+            战队正在备战训练，新的赛事战报即将上线。关注我们，不错过每一场对决。
+          </p>
+          <div class="mt-7 flex flex-wrap justify-center gap-3">
+            <Button href="/team" variant="outline" icon="users">
+              认识战队
+            </Button>
+            <Button href={site.links.bilibili} icon="bilibili" newTab>
+              往期视频
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div class="space-y-14">
+          {groups.map((g) => (
+            <section>
+              <div class="mb-6 flex items-center gap-4">
+                <h2 class="flex items-baseline gap-1 text-2xl font-bold sm:text-3xl">
+                  <span class="aurora-text">{g.year}</span>
+                  {typeof g.year === "number" && (
+                    <span class="text-slate-400 dark:text-slate-500">年</span>
+                  )}
+                </h2>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+                  {g.items.length} 场
+                </span>
+                <span class="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-white/10" />
+              </div>
+              <div class="space-y-6">
+                {g.items.map((event) => (
+                  <Scoreboard event={event} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )
+    }
+  </Section>
+</BaseLayout>

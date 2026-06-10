@@ -1,0 +1,226 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { asset } from "@/lib/utils";
+import { site } from "@/data/site";
+
+const reasons = [
+  {
+    icon: "graduation-cap",
+    title: "培养卓越工程人才",
+    desc: "成员在真实的工程项目中淬炼成长，从机械、电控到算法，全链路掌握硬核技能，毕业生广泛进入头部科技企业与高校深造。",
+  },
+  {
+    icon: "cpu",
+    title: "推动科技创新",
+    desc: "自主研发机器人控制、机器视觉与机械结构，持续沉淀可转化的技术成果、开源项目与发明专利，让赞助成为创新的助推器。",
+  },
+  {
+    icon: "target",
+    title: "品牌曝光与人才对接",
+    desc: "依托 RoboMaster 机甲大师赛的赛事直播与校园影响力，让企业品牌精准触达海量理工科学子，搭建高效的人才直通桥梁。",
+  },
+];
+
+const tiers = [
+  {
+    icon: "wrench",
+    name: "物资支持",
+    tagline: "元器件 · 加工 · 设备",
+    featured: false,
+    benefits: [
+      "战队官网与微信公众号鸣谢致谢",
+      "赞助物资用于赛事备战与日常训练",
+      "战队定制周边与纪念礼品回馈",
+    ],
+  },
+  {
+    icon: "medal",
+    name: "金牌赞助",
+    tagline: "资金 · 品牌 · 人才",
+    featured: true,
+    benefits: [
+      "官网首页与公众号显著位置展示企业 Logo",
+      "战车涂装 / 队服印制企业品牌标识",
+      "优先获取战队技术成果与赛事报道",
+      "定向校园宣讲与优秀人才推荐",
+    ],
+  },
+  {
+    icon: "handshake",
+    name: "战略合作伙伴",
+    tagline: "长期 · 深度 · 共建",
+    featured: false,
+    benefits: [
+      "深度联合研发与技术共建",
+      "定制化产学研合作项目落地",
+      "全年品牌联合曝光与活动冠名",
+      "专属人才直通车与实习内推",
+    ],
+  },
+];
+
+const partners = [
+  "/images/26b954bf-1821-4a78-81f4-0c43c0bca31a.png",
+  "/images/c7de86e0-a829-4d6d-9329-3228f57ded92.png",
+];
+---
+
+<BaseLayout
+  title="赞助我们"
+  description="赞助 Aurora 战队 —— 与我们一同培养卓越工程人才、推动科技创新，并获得品牌曝光与人才对接的回报。"
+>
+  <PageHero
+    icon="handshake"
+    eyebrow="合作赞助"
+    title="赞助我们"
+    subtitle="携手 Aurora 战队，共同点燃机器人竞技的热爱，成就下一代工程师。"
+  />
+
+  <!-- 为什么赞助我们 -->
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-bold sm:text-3xl">为什么赞助我们</h2>
+      <p class="mt-3 text-slate-600 dark:text-slate-400">
+        每一份支持，都将转化为赛场上的速度与精度，也将成为青年工程师梦想的起点。
+      </p>
+    </div>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      {
+        reasons.map((r) => (
+          <div class="card flex flex-col p-7">
+            <span class="inline-flex size-12 items-center justify-center rounded-xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+              <Icon name={r.icon} class="size-6" />
+            </span>
+            <h3 class="mt-5 text-lg font-semibold">{r.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              {r.desc}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- 赞助方式 / 回报 -->
+  <Section dark>
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-bold text-white sm:text-3xl">赞助方式与回报</h2>
+      <p class="mt-3 text-slate-300">
+        我们提供灵活的合作形式 —— 从物资赞助到战略共建，并以诚意满满的权益作为回报。
+      </p>
+    </div>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      {
+        tiers.map((t) => (
+          <div
+            class={`relative flex flex-col rounded-2xl border p-7 backdrop-blur transition duration-300 ${
+              t.featured
+                ? "border-brand-500/50 bg-brand-500/10 shadow-[0_8px_40px_-12px_rgba(245,52,59,0.45)]"
+                : "border-white/10 bg-white/[0.04] hover:border-white/20"
+            }`}
+          >
+            {t.featured && (
+              <span class="absolute -top-3 left-7 inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+                <Icon name="sparkles" class="size-3.5" />
+                推荐
+              </span>
+            )}
+            <span
+              class={`inline-flex size-12 items-center justify-center rounded-xl ${
+                t.featured
+                  ? "bg-brand-500/20 text-brand-300"
+                  : "bg-white/10 text-aurora-cyan"
+              }`}
+            >
+              <Icon name={t.icon} class="size-6" />
+            </span>
+            <h3 class="mt-5 text-xl font-semibold text-white">{t.name}</h3>
+            <p class="mt-1 text-sm text-slate-400">{t.tagline}</p>
+            <ul class="mt-5 space-y-3 text-sm text-slate-200">
+              {t.benefits.map((b) => (
+                <li class="flex gap-2.5">
+                  <Icon
+                    name="chevron-right"
+                    class="mt-0.5 size-4 shrink-0 text-brand-400"
+                  />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mt-8 text-sm text-slate-400">
+      以上为参考方案，我们乐于根据企业需求量身定制专属合作权益，欢迎进一步洽谈。
+    </p>
+  </Section>
+
+  <!-- 合作伙伴 -->
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-bold sm:text-3xl">合作伙伴</h2>
+      <p class="mt-3 text-slate-600 dark:text-slate-400">
+        感谢以下单位与企业一路同行 —— 是你们的信任，让 Aurora 走得更远。
+      </p>
+    </div>
+
+    <div class="mt-10 grid items-center gap-8 lg:grid-cols-5">
+      <div class="overflow-hidden rounded-2xl lg:col-span-3">
+        <img
+          src={asset("/images/cooporate.jpeg")}
+          alt="Aurora 战队合作交流"
+          width="960"
+          height="540"
+          loading="lazy"
+          class="h-full w-full object-cover"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-5 lg:col-span-2">
+        {
+          partners.map((logo) => (
+            <div class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10">
+              <img
+                src={asset(logo)}
+                alt="合作伙伴 Logo"
+                width="120"
+                height="120"
+                loading="lazy"
+                class="h-20 w-auto object-contain"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </Section>
+
+  <!-- 联系 CTA -->
+  <Section background="/images/background.jpg" innerClass="max-w-3xl text-center">
+    <p class="text-sm font-semibold uppercase tracking-widest text-brand-300">
+      Let's Cooperate
+    </p>
+    <h2 class="mt-3 text-3xl font-bold text-white sm:text-4xl">成为我们的赞助商</h2>
+    <p class="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-200">
+      期待与你携手，共同书写属于 Aurora 战队的下一段征程。
+      企业赞助或合作事务洽谈，欢迎通过以下方式联系我们。
+    </p>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <Button href={`mailto:${site.contact.email}`} icon="mail" variant="primary"
+        >邮箱洽谈</Button
+      >
+      <Button href="/contact" icon="arrow-right" iconPosition="right" variant="secondary"
+        >查看联系方式</Button
+      >
+    </div>
+    <p class="mt-6 inline-flex items-center gap-2 text-sm text-slate-200">
+      <Icon name="wechat" class="size-5 text-aurora-emerald" />
+      合作微信：
+      <span class="select-all font-mono font-semibold text-white">{site.contact.wechat}</span>
+    </p>
+  </Section>
+</BaseLayout>

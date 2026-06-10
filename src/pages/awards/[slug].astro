@@ -1,0 +1,164 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import PageHero from "@/components/PageHero.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { medalTier, formatYearMonth, link } from "@/lib/utils";
+
+export const getStaticPaths = (async () => {
+  const awards = await getCollection("awards");
+  return awards.map((award) => ({
+    params: { slug: award.id },
+    props: { award },
+  }));
+}) satisfies GetStaticPaths;
+
+const { award } = Astro.props;
+const { name, type, prize, date, members, description } = award.data;
+
+const members_all = await getCollection("members");
+const memberIds = new Set(members_all.map((m) => m.id));
+const memberList = members ?? [];
+
+const typeName = (type ?? "").trim();
+const tier = medalTier(prize);
+const dateLabel = formatYearMonth(date);
+
+const { Content } = await render(award);
+const hasBody = (award.body ?? "").trim().length > 0;
+
+const tierStyles: Record<string, { badge: string; label: string; icon: string }> = {
+  gold: {
+    badge:
+      "bg-amber-100 text-amber-700 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25",
+    label: "金奖级",
+    icon: "trophy",
+  },
+  silver: {
+    badge:
+      "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-white/10 dark:text-slate-200 dark:ring-white/15",
+    label: "银奖级",
+    icon: "medal",
+  },
+  bronze: {
+    badge:
+      "bg-amber-700/10 text-amber-800 ring-amber-700/20 dark:bg-amber-700/15 dark:text-amber-500 dark:ring-amber-700/30",
+    label: "铜奖级",
+    icon: "medal",
+  },
+  none: {
+    badge:
+      "bg-slate-100 text-slate-500 ring-slate-200 dark:bg-white/5 dark:text-slate-400 dark:ring-white/10",
+    label: "参赛奖",
+    icon: "sparkles",
+  },
+};
+const ts = tierStyles[tier];
+
+const typeStyles: Record<string, string> = {
+  国际级:
+    "bg-aurora-violet/10 text-aurora-violet ring-aurora-violet/20 dark:bg-aurora-violet/15 dark:text-violet-300 dark:ring-aurora-violet/30",
+  国家级:
+    "bg-brand-50 text-brand-600 ring-brand-200 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-500/25",
+  省级:
+    "bg-azure-50 text-azure-700 ring-azure-200 dark:bg-azure-500/10 dark:text-azure-300 dark:ring-azure-500/25",
+};
+const typeBadge =
+  typeStyles[typeName] ??
+  "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10";
+
+const badgeBase =
+  "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ring-1 ring-inset";
+---
+
+<BaseLayout title={name} description={description ?? prize ?? undefined}>
+  <PageHero icon="trophy" eyebrow="成果详情" title={name}>
+    <div class="mt-5 flex flex-wrap items-center gap-2.5">
+      {
+        typeName && typeName !== "其他" && (
+          <span class={`${badgeBase} ${typeBadge}`}>{typeName}</span>
+        )
+      }
+      <span class={`${badgeBase} ${ts.badge}`}>
+        <Icon name={ts.icon} class="size-4" />
+        {ts.label}
+      </span>
+      {
+        prize && (
+          <span class={`${badgeBase} bg-slate-100 text-slate-700 ring-slate-200 dark:bg-white/5 dark:text-slate-200 dark:ring-white/10`}>
+            {prize}
+          </span>
+        )
+      }
+      {
+        dateLabel && (
+          <span class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Icon name="calendar" class="size-4" />
+            {dateLabel}
+          </span>
+        )
+      }
+    </div>
+
+    {
+      memberList.length > 0 && (
+        <div class="mt-4 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+          <Icon name="users" class="mr-1 size-4 shrink-0 text-slate-400" />
+          {memberList.map((m, i) => (
+            <>
+              {memberIds.has(m) ? (
+                <a
+                  href={link("/members/" + m)}
+                  class="font-medium text-slate-700 underline decoration-slate-300 decoration-dotted underline-offset-2 transition hover:text-brand-600 hover:decoration-brand-400 dark:text-slate-200 dark:decoration-white/20 dark:hover:text-brand-400"
+                >
+                  {m}
+                </a>
+              ) : (
+                <span>{m}</span>
+              )}
+              {i < memberList.length - 1 && (
+                <span class="text-slate-300 dark:text-slate-600">·</span>
+              )}
+            </>
+          ))}
+        </div>
+      )
+    }
+  </PageHero>
+
+  <Section size="narrow">
+    <div class="mb-8">
+      <a
+        href={link("/research")}
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+      >
+        <Icon name="arrow-left" class="size-4" /> 返回成果列表
+      </a>
+    </div>
+
+    {
+      description && (
+        <p class="border-l-4 border-brand-400 pl-4 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+          {description}
+        </p>
+      )
+    }
+
+    {
+      hasBody && (
+        <div class:list={["prose-aurora", description && "mt-8"]}>
+          <Content />
+        </div>
+      )
+    }
+
+    <div class="mt-12 border-t border-slate-200/70 pt-6 dark:border-white/10">
+      <Button href="/research" variant="outline" icon="arrow-left">
+        返回成果总览
+      </Button>
+    </div>
+  </Section>
+</BaseLayout>

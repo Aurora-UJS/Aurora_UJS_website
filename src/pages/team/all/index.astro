@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import MemberCard from "@/components/team/MemberCard.astro";
+import { matchesField } from "@/lib/utils";
+
+const members = await getCollection("members");
+
+const teachers = members.filter((m) => matchesField(m.data.role, "指导老师"));
+const leaders = members.filter((m) => matchesField(m.data.type, "负责人") || matchesField(m.data.type, "队长"));
+const taken = new Set([...teachers, ...leaders].map((m) => m.id));
+const rest = members.filter((m) => !taken.has(m.id));
+
+type Size = "default" | "small" | "tiny";
+const allGroups: { title: string; icon: string; size: Size; items: typeof members }[] = [
+  { title: "指导老师", icon: "graduation-cap", size: "default", items: teachers },
+  { title: "团队负责人", icon: "user", size: "default", items: leaders },
+  { title: "队员", icon: "users", size: "small", items: rest },
+];
+const groups = allGroups.filter((g) => g.items.length > 0);
+
+const gridCols: Record<Size, string> = {
+  default: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+  small: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5",
+  tiny: "grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8",
+};
+---
+
+<BaseLayout
+  title="所有成员"
+  description="江苏大学 Aurora 战队历届全体成员名单 —— 指导老师、团队负责人与全体队员。"
+>
+  <PageHero
+    icon="users"
+    eyebrow="历届成员"
+    title="所有成员"
+    subtitle="Aurora 战队历届全体成员名单。按赛季检索请前往历届成员页。"
+  >
+    <div class="mt-6 flex flex-wrap gap-3">
+      <Button href="/team" variant="outline" size="sm" icon="users">25 赛季成员</Button>
+      <Button href="/team/history" variant="ghost" size="sm" icon="arrow-right" iconPosition="right">
+        按赛季检索
+      </Button>
+    </div>
+  </PageHero>
+
+  <Section>
+    {
+      members.length > 0 ? (
+        <div class="space-y-16">
+          {groups.map((group) => (
+            <div>
+              <div class="mb-6 flex items-center gap-3">
+                <span class="inline-flex size-9 items-center justify-center rounded-lg bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                  <Icon name={group.icon} class="size-5" />
+                </span>
+                <h2 class="text-xl font-bold sm:text-2xl">{group.title}</h2>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+                  {group.items.length} 人
+                </span>
+              </div>
+              <div class={`grid gap-4 ${gridCols[group.size]}`}>
+                {group.items.map((entry) => (
+                  <MemberCard entry={entry} size={group.size} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="card mx-auto flex max-w-xl flex-col items-center gap-3 p-12 text-center">
+          <span class="inline-flex size-14 items-center justify-center rounded-full bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <Icon name="users" class="size-7" />
+          </span>
+          <p class="text-lg font-semibold text-slate-900 dark:text-white">成员名单整理中</p>
+          <p class="max-w-md text-sm text-slate-500 dark:text-slate-400">
+            成员信息即将上线，敬请期待。
+          </p>
+          <div class="mt-2">
+            <Button href="/team" variant="outline" icon="arrow-left" iconPosition="left">
+              返回成员
+            </Button>
+          </div>
+        </div>
+      )
+    }
+  </Section>
+</BaseLayout>

@@ -1,0 +1,257 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import PageHero from "@/components/PageHero.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import RobotCard from "@/components/projects/RobotCard.astro";
+import { link, formatYear } from "@/lib/utils";
+
+/** 7 RoboMaster robots — ported faithfully from the legacy projects/index.md. */
+const robots: { icon: string; title: string; points: string[] }[] = [
+  {
+    icon: "target",
+    title: "英雄机器人",
+    points: [
+      "自适应底盘设计：适应多种地形运动，避免轮子悬空空转导致功率浪费。",
+      "三摩擦轮设计：20m 吊射 42mm 大弹丸打击大装甲板大小模块，命中率 60%；可自动瞄准打击 7–8m 旋转装甲板。",
+      "超级电容：四开关 buck-boost 实现 300W 稳定放电。",
+      "软件控制实现功率控制、PID + 跟踪微分器 + 前馈，并利用弹道方程结合打击目标标定发射机构参数。",
+      "视觉部分实现 YOLO v8 关键点检测、PNP 位姿解算。",
+    ],
+  },
+  {
+    icon: "bot",
+    title: "步兵机器人",
+    points: [
+      "多种底盘结构：全向轮、麦克纳姆轮、轮腿。",
+      "FreeRTOS 操作系统实现单片机伪多线程处理。",
+      "多轮组运动方程解算，满足不同机器人底盘需求。",
+      "PID & ADRC 实现云台精准控制。",
+    ],
+  },
+  {
+    icon: "cpu",
+    title: "哨兵机器人",
+    points: [
+      "全自动运行：卡尔曼运动融合多传感器数据，使机器人自我感知运动状态。",
+      "全自动导航：全自由度舵轮赋能精准里程计，结合激光雷达 DLIO 定位与 PCL 点云处理，机内完成大量点云处理。",
+      "PCL 可视化地图深度融合 A* 路径规划。",
+    ],
+  },
+  {
+    icon: "wrench",
+    title: "工程机器人",
+    points: [
+      "六轴机械臂，仿生手臂设计方便复杂地形物体获取。",
+      "电磁阀结合真空泵实现真空链路，轻松吸取物品。",
+      "并联机械臂结构，方便多目标简单获取。",
+    ],
+  },
+  {
+    icon: "rocket",
+    title: "空中机器人",
+    points: [
+      "自主研发 48V 高功率供电板。",
+      "轻量化机身设计四轴多旋翼无人机。",
+      "Guidance 视觉定位稳定悬停，非线性预测、飞控通道映射助力稳定悬停。",
+    ],
+  },
+  {
+    icon: "swords",
+    title: "飞镖机器人",
+    points: [
+      "多种方案并行验证，采用双极摩擦轮方案，配合摩擦轮温控系统，精确控制发射时条件一致性。",
+      "精确控制发射底座朝向，提升 20m 命中率。",
+    ],
+  },
+  {
+    icon: "play-circle",
+    title: "雷达机器人",
+    points: [
+      "利用工业相机结合激光雷达实现多目标识别、定位和交互。",
+      "软件基于 Ubuntu 平台实现 YOLO v8 目标检测、目标定位与决策通信，点云聚类极限达 50 FPS。",
+    ],
+  },
+];
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+const patents = (await getCollection("patents")).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+
+/** First few inventor names, then "等N人" when the list is longer. */
+function inventors(members: string[]): string {
+  const shown = members.slice(0, 3);
+  return members.length > shown.length
+    ? `${shown.join("、")} 等${members.length}人`
+    : shown.join("、");
+}
+---
+
+<BaseLayout
+  title="我们的项目"
+  description="Aurora 战队的 RoboMaster 机器人矩阵、科研项目与专利成果。"
+>
+  <PageHero
+    icon="bot"
+    eyebrow="项目与研发"
+    title="我们的项目"
+    subtitle="从 RoboMaster 赛场到科研与专利 —— 这是 Aurora 战队的硬核技术版图。"
+  >
+    <div class="mt-7 flex flex-wrap gap-3">
+      <Button href="#robots" variant="primary" icon="bot">机器人矩阵</Button>
+      <Button href="#research" variant="outline" icon="microscope">科研项目</Button>
+      <Button href="#patents" variant="outline" icon="file-text">专利成果</Button>
+    </div>
+  </PageHero>
+
+  <!-- ============ RoboMaster 机器人矩阵 ============ -->
+  <Section id="robots" background="/images/background.jpg" size="wide">
+    <div class="max-w-3xl">
+      <p
+        class="text-sm font-semibold uppercase tracking-widest text-brand-400"
+      >
+        ROBOMASTER
+      </p>
+      <h2 class="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
+        RoboMaster 机器人矩阵
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-white/70">
+        七类兵种协同作战，覆盖机械、电控、视觉与算法全链路自主研发。
+      </p>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        robots.map((r) => (
+          <RobotCard icon={r.icon} title={r.title} points={r.points} />
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- ============ 科研项目 ============ -->
+  <Section id="research">
+    <div class="max-w-3xl">
+      <p
+        class="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400"
+      >
+        RESEARCH
+      </p>
+      <h2
+        class="mt-3 font-display text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
+      >
+        科研项目
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+        以赛促研，将竞赛中沉淀的技术延伸到真实场景的工程与科研课题。
+      </p>
+    </div>
+
+    {
+      projects.length > 0 ? (
+        <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((p) => {
+            const year = formatYear(p.data.date);
+            return (
+              <a
+                href={link("/projects/" + p.id)}
+                class="card group flex flex-col p-6"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  {p.data.type && (
+                    <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
+                      {p.data.type}
+                    </span>
+                  )}
+                  {year && (
+                    <span class="text-xs font-medium text-slate-400 dark:text-slate-500">
+                      {year}
+                    </span>
+                  )}
+                </div>
+                <h3 class="mt-3 font-display text-lg font-semibold text-slate-900 transition-colors group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                  {p.data.name}
+                </h3>
+                {p.data.members && p.data.members.length > 0 && (
+                  <p class="mt-2 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                    <Icon name="users" class="size-4 shrink-0" />
+                    {p.data.members.join("、")}
+                  </p>
+                )}
+                <span class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-600 transition-all group-hover:gap-2 dark:text-brand-400">
+                  查看详情
+                  <Icon name="arrow-right" class="size-4" />
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="mt-10 rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center text-slate-500 dark:border-white/10 dark:text-slate-400">
+          科研项目正在整理中，敬请期待。
+        </p>
+      )
+    }
+  </Section>
+
+  <!-- ============ 专利成果 ============ -->
+  <Section id="patents" class="bg-slate-50 dark:bg-night-900">
+    <div class="max-w-3xl">
+      <p
+        class="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400"
+      >
+        PATENTS
+      </p>
+      <h2
+        class="mt-3 font-display text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl"
+      >
+        专利成果
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+        技术创新落地为知识产权，下面是战队已授权的发明专利与实用新型。
+      </p>
+    </div>
+
+    {
+      patents.length > 0 ? (
+        <ul class="mt-10 space-y-4">
+          {patents.map((pt) => (
+            <li class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6">
+              <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-aurora-violet/15 to-aurora-cyan/15 text-aurora-violet ring-1 ring-inset ring-aurora-violet/20 dark:text-aurora-cyan dark:ring-aurora-cyan/25">
+                <Icon name="file-text" class="size-6" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <h3 class="font-display text-base font-semibold text-slate-900 dark:text-white">
+                    {pt.data.name}
+                  </h3>
+                  {pt.data.type && (
+                    <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
+                      {pt.data.type}
+                    </span>
+                  )}
+                </div>
+                <p class="mt-1.5 font-mono text-xs tracking-wide text-slate-500 dark:text-slate-400">
+                  {pt.data.ID}
+                </p>
+                <p class="mt-2 flex items-start gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                  <Icon name="users" class="mt-0.5 size-4 shrink-0" />
+                  <span>发明人：{inventors(pt.data.members)}</span>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-10 rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center text-slate-500 dark:border-white/10 dark:text-slate-400">
+          专利成果正在整理中，敬请期待。
+        </p>
+      )
+    }
+  </Section>
+</BaseLayout>

@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+---
+
+<BaseLayout title="页面未找到">
+  <section
+    class="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-slate-50 px-5 py-20 dark:bg-night-950"
+  >
+    <!-- ambient glows (match PageHero palette) -->
+    <div
+      class="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-gradient-to-br from-brand-500/20 to-aurora-violet/20 blur-3xl"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-gradient-to-tr from-aurora-cyan/20 to-aurora-emerald/20 blur-3xl"
+    >
+    </div>
+
+    <div class="relative flex max-w-lg flex-col items-center text-center">
+      <span
+        class="inline-flex size-16 items-center justify-center rounded-2xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400"
+      >
+        <Icon name="heart-crack" class="size-9" />
+      </span>
+
+      <p
+        class="mt-8 font-display text-7xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-8xl"
+      >
+        4<span class="aurora-text">0</span>4
+      </p>
+      <h1 class="mt-2 text-2xl font-bold sm:text-3xl">页面未找到</h1>
+      <p class="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+        抱歉，你访问的页面可能已被移动、删除，或从未存在。<br
+          class="hidden sm:inline"
+        />不如返回首页，继续探索 Aurora 战队的世界。
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <Button href="/" icon="arrow-left" variant="primary">返回首页</Button>
+        <Button href="/contact" icon="mail" variant="outline">联系我们</Button>
+      </div>
+
+      <p class="mt-10 font-display text-sm font-semibold text-brand-600 dark:text-brand-400">
+        「矢志不退，勇者无畏」
+      </p>
+    </div>
+  </section>
+</BaseLayout>

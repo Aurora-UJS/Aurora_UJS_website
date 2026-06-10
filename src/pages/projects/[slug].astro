@@ -1,0 +1,96 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import PageHero from "@/components/PageHero.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { link, formatYear } from "@/lib/utils";
+
+export const getStaticPaths = (async () => {
+  const projects = await getCollection("projects");
+  return projects.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const { name, type, members, date, description } = entry.data;
+const { Content } = await render(entry);
+const hasBody = entry.body != null && entry.body.trim().length > 0;
+const year = formatYear(date);
+
+const meta: { icon: string; label: string; value: string }[] = [];
+if (type) meta.push({ icon: "sparkles", label: "类型", value: type });
+if (year) meta.push({ icon: "calendar", label: "时间", value: year });
+if (members && members.length > 0)
+  meta.push({ icon: "users", label: "成员", value: members.join("、") });
+---
+
+<BaseLayout title={name} description={description ?? `Aurora 战队科研项目：${name}`}>
+  <PageHero icon="microscope" eyebrow="科研项目" title={name} />
+
+  <Section size="narrow">
+    <a
+      href={link("/projects")}
+      class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+    >
+      <Icon name="arrow-left" class="size-4" />
+      返回项目列表
+    </a>
+
+    {
+      meta.length > 0 && (
+        <dl class="mt-6 grid gap-4 sm:grid-cols-3">
+          {meta.map((m) => (
+            <div class="card flex items-start gap-3 p-4">
+              <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                <Icon name={m.icon} class="size-5" />
+              </span>
+              <div class="min-w-0">
+                <dt class="text-xs font-medium uppercase tracking-wider text-slate-400">
+                  {m.label}
+                </dt>
+                <dd class="mt-0.5 text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {m.value}
+                </dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+
+    {
+      description && (
+        <p class="mt-8 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+          {description}
+        </p>
+      )
+    }
+
+    {
+      hasBody && (
+        <div class="prose-aurora mt-8">
+          <Content />
+        </div>
+      )
+    }
+
+    {
+      !description && !hasBody && (
+        <p class="mt-8 rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center text-slate-500 dark:border-white/10 dark:text-slate-400">
+          项目详细介绍正在完善中，敬请期待。
+        </p>
+      )
+    }
+
+    <div class="mt-10">
+      <Button href="/projects" variant="outline" icon="arrow-left">
+        返回项目
+      </Button>
+    </div>
+  </Section>
+</BaseLayout>

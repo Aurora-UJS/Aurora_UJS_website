@@ -1,0 +1,73 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import MemberCard from "@/components/team/MemberCard.astro";
+import { matchesField } from "@/lib/utils";
+
+const members = await getCollection("members");
+
+// 23 赛季成员：time 或 echelon 包含 "23"。
+const seasonMembers = members.filter(
+  (m) => matchesField(m.data.time, "23") || matchesField(m.data.echelon, "23"),
+);
+---
+
+<BaseLayout
+  title="23 赛季成员"
+  description="江苏大学 Aurora 战队 2023 赛季参赛阵容。"
+>
+  <PageHero
+    icon="users"
+    eyebrow="历届成员 · 23 赛季"
+    title="23 赛季成员"
+    subtitle="2023 赛季征战 RoboMaster 赛场的 Aurora 阵容。"
+  >
+    <div class="mt-6 flex flex-wrap gap-3">
+      <Button href="/team/history" variant="outline" size="sm" icon="arrow-left">历届成员</Button>
+      <Button href="/team" variant="ghost" size="sm" icon="arrow-right" iconPosition="right">
+        25 赛季成员
+      </Button>
+    </div>
+  </PageHero>
+
+  <Section>
+    {
+      seasonMembers.length > 0 ? (
+        <div>
+          <div class="mb-6 flex items-center gap-3">
+            <span class="inline-flex size-9 items-center justify-center rounded-lg bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+              <Icon name="users" class="size-5" />
+            </span>
+            <h2 class="text-xl font-bold sm:text-2xl">23 赛季阵容</h2>
+            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+              {seasonMembers.length} 人
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {seasonMembers.map((entry) => (
+              <MemberCard entry={entry} size="small" />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div class="card mx-auto flex max-w-xl flex-col items-center gap-3 p-12 text-center">
+          <span class="inline-flex size-14 items-center justify-center rounded-full bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <Icon name="users" class="size-7" />
+          </span>
+          <p class="text-lg font-semibold text-slate-900 dark:text-white">暂无 23 赛季成员记录</p>
+          <p class="max-w-md text-sm text-slate-500 dark:text-slate-400">
+            该赛季成员名单正在整理中。你可以查看其他历届成员或当前赛季阵容。
+          </p>
+          <div class="mt-2 flex flex-wrap justify-center gap-3">
+            <Button href="/team/history" variant="outline" icon="arrow-left">历届成员</Button>
+            <Button href="/team" icon="arrow-right" iconPosition="right">25 赛季成员</Button>
+          </div>
+        </div>
+      )
+    }
+  </Section>
+</BaseLayout>

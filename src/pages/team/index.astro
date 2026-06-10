@@ -1,0 +1,110 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import MemberCard from "@/components/team/MemberCard.astro";
+import { matchesField } from "@/lib/utils";
+
+const members = await getCollection("members");
+
+type Size = "default" | "small" | "tiny";
+const allGroups: { title: string; icon: string; size: Size; items: typeof members }[] = [
+  { title: "指导老师", icon: "graduation-cap", size: "default", items: members.filter((m) => matchesField(m.data.role, "指导老师")) },
+  { title: "团队负责人", icon: "user", size: "default", items: members.filter((m) => matchesField(m.data.type, "负责人") || matchesField(m.data.type, "队长")) },
+  { title: "机械组", icon: "wrench", size: "small", items: members.filter((m) => matchesField(m.data.role, "机械组")) },
+  { title: "硬件组", icon: "cpu", size: "small", items: members.filter((m) => matchesField(m.data.role, "硬件组")) },
+  { title: "嵌软组", icon: "bot", size: "small", items: members.filter((m) => matchesField(m.data.role, "嵌软组")) },
+  { title: "算法组", icon: "target", size: "small", items: members.filter((m) => matchesField(m.data.role, "算法组")) },
+  { title: "运营组", icon: "feather", size: "small", items: members.filter((m) => matchesField(m.data.role, "运营组")) },
+  { title: "梯队", icon: "users", size: "tiny", items: members.filter((m) => matchesField(m.data.echelon, "25")) },
+  { title: "杰出人物", icon: "sparkles", size: "default", items: members.filter((m) => matchesField(m.data.type, "杰出人物")) },
+];
+const groups = allGroups.filter((g) => g.items.length > 0);
+
+const gridCols: Record<Size, string> = {
+  default: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+  small: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5",
+  tiny: "grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8",
+};
+---
+
+<BaseLayout
+  title="团队成员"
+  description="江苏大学 Aurora 战队 25 赛季团队成员名单 —— 机械、硬件、嵌软、算法、运营各组协同作战。"
+>
+  <PageHero
+    icon="users"
+    eyebrow="25 赛季"
+    title="团队成员"
+    subtitle="一群热爱机器人的青年工程师，在机械、硬件、嵌软、算法、运营各组分工协作，征战 RoboMaster 赛场。"
+  >
+    <div class="mt-6 flex flex-wrap gap-3">
+      <Button href="/team/all" variant="outline" size="sm" icon="users">所有成员</Button>
+      <Button href="/team/history" variant="ghost" size="sm" icon="arrow-right" iconPosition="right">
+        历届成员
+      </Button>
+    </div>
+  </PageHero>
+
+  <Section>
+    {
+      groups.length > 0 ? (
+        <div class="space-y-16">
+          {groups.map((group) => (
+            <div>
+              <div class="mb-6 flex items-center gap-3">
+                <span class="inline-flex size-9 items-center justify-center rounded-lg bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                  <Icon name={group.icon} class="size-5" />
+                </span>
+                <h2 class="text-xl font-bold sm:text-2xl">{group.title}</h2>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+                  {group.items.length} 人
+                </span>
+              </div>
+              <div class={`grid gap-4 ${gridCols[group.size]}`}>
+                {group.items.map((entry) => (
+                  <MemberCard entry={entry} size={group.size} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="card mx-auto flex max-w-xl flex-col items-center gap-3 p-12 text-center">
+          <span class="inline-flex size-14 items-center justify-center rounded-full bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+            <Icon name="users" class="size-7" />
+          </span>
+          <p class="text-lg font-semibold text-slate-900 dark:text-white">成员名单整理中</p>
+          <p class="max-w-md text-sm text-slate-500 dark:text-slate-400">
+            25 赛季成员信息即将上线，敬请期待。你也可以查看历届成员，或了解如何加入我们。
+          </p>
+          <div class="mt-2 flex flex-wrap justify-center gap-3">
+            <Button href="/team/history" variant="outline" icon="users">历届成员</Button>
+            <Button href="/contact" icon="arrow-right" iconPosition="right">加入我们</Button>
+          </div>
+        </div>
+      )
+    }
+  </Section>
+
+  <Section background="/images/background.jpg">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="font-display text-sm font-semibold uppercase tracking-widest text-brand-400">
+        Aurora 战队
+      </p>
+      <h2 class="mt-3 text-2xl font-bold text-white sm:text-3xl">矢志不退，勇者无畏</h2>
+      <p class="mt-4 text-slate-300">
+        每一位成员都是极光中的一束光。回顾历届阵容，或加入我们，一同征战赛场。
+      </p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <Button href="/team/all" variant="primary" icon="users">所有成员</Button>
+        <Button href="/team/history" variant="secondary" icon="arrow-right" iconPosition="right">
+          历届成员
+        </Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

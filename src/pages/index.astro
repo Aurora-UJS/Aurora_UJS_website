@@ -1,0 +1,170 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import Hero from "@/components/home/Hero.astro";
+import Feature from "@/components/home/Feature.astro";
+
+const [awards, projects, patents, members] = await Promise.all([
+  getCollection("awards"),
+  getCollection("projects"),
+  getCollection("patents"),
+  getCollection("members"),
+]);
+
+const stats = [
+  { value: awards.length, label: "竞赛奖项", icon: "trophy" },
+  { value: projects.length, label: "合作项目", icon: "rocket" },
+  { value: patents.length, label: "专利成果", icon: "file-text" },
+  { value: members.length, label: "团队成员", icon: "users" },
+];
+// Only surface stats that actually have data; hide the whole strip until ≥2.
+const visibleStats = stats.filter((s) => s.value > 0);
+const statsGrid =
+  visibleStats.length >= 4
+    ? "grid-cols-2 md:grid-cols-4"
+    : visibleStats.length === 3
+      ? "mx-auto max-w-3xl grid-cols-3"
+      : "mx-auto max-w-md grid-cols-2";
+---
+
+<BaseLayout>
+  <Hero />
+
+  <!-- stats strip (overlaps the bottom of the hero; hidden until ≥2 stats have data) -->
+  <section id="explore" class="relative z-20 scroll-mt-24">
+    {
+      visibleStats.length >= 2 && (
+        <div class="container-page -mt-16 sm:-mt-24">
+          <div class={`grid gap-4 sm:gap-6 ${statsGrid}`}>
+            {visibleStats.map((stat) => (
+              <div class="card flex flex-col items-center gap-2 px-4 py-7 text-center sm:py-9">
+                <span class="inline-flex size-10 items-center justify-center rounded-xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                  <Icon name={stat.icon} class="size-5" />
+                </span>
+                <span class="font-display text-4xl font-bold text-slate-900 dark:text-white sm:text-5xl">
+                  {stat.value}
+                </span>
+                <span class="text-sm text-slate-500 dark:text-slate-400">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </section>
+
+  <!-- feature blocks -->
+  <Section size="wide">
+    <div class="mx-auto max-w-2xl text-center">
+      <p
+        class="mb-3 text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400"
+      >
+        走进 Aurora
+      </p>
+      <h2 class="text-3xl font-bold sm:text-4xl">
+        我们是谁，<span class="aurora-text">我们在做什么</span>
+      </h2>
+      <p class="mt-4 text-lg text-slate-600 dark:text-slate-400">
+        从赛场到实验室，从机械到算法 —— 这是一支为热爱而战的年轻战队。
+      </p>
+    </div>
+
+    <div class="mt-16 space-y-20 sm:space-y-28">
+      <Feature
+        title="我们的成果"
+        image="/images/cheer.jpg"
+        href="/research"
+        eyebrow="成果 · Achievements"
+        icon="trophy"
+        cta="我们的更多成果"
+      >
+        <p>
+          从 2019 到 2025，Aurora
+          在 RoboMaster 机甲大师赛及各类科技创新竞赛中屡获佳绩。区域赛、全国赛的赛场上，一次次突破与登台，
+          记录着每一代队员的拼搏与成长。
+        </p>
+      </Feature>
+
+      <Feature
+        title="我们的项目"
+        image="/images/cooporate.jpeg"
+        href="/projects"
+        eyebrow="项目 · Projects"
+        icon="rocket"
+        cta="我们的所有项目"
+        flip
+      >
+        <p>
+          作为一支多学科交叉的机器人团队，我们与企业、高校开展深度合作，承接科研与工程项目。
+          在真实需求与实战打磨中，推动科技创新，加速人才培养。
+        </p>
+      </Feature>
+
+      <Feature
+        title="我们的成员"
+        image="/images/background.jpg"
+        href="/team"
+        eyebrow="成员 · Team"
+        icon="users"
+        cta="我们的所有成员"
+      >
+        <p>
+          这里汇聚了机械、硬件、嵌软、算法、运营等多个方向的伙伴。不同专业、同一热爱，
+          我们在协作中打磨技术，也在并肩作战里收获默契与友谊。
+        </p>
+      </Feature>
+
+      <Feature
+        title="我们的新闻"
+        image="/images/news.jpeg"
+        href="/news"
+        eyebrow="新闻 · News"
+        icon="newspaper"
+        cta="我们的最近动态"
+        flip
+      >
+        <p>
+          从赛场到校园，从技术分享到社会实践，Aurora 始终活跃在舞台中央，积极展现战队风采。
+          关注我们的最新动态，见证每一次精彩亮相。
+        </p>
+      </Feature>
+    </div>
+  </Section>
+
+  <!-- closing recruitment CTA -->
+  <Section dark background="/images/background.jpg" class="text-center">
+    <div class="mx-auto max-w-2xl">
+      <span
+        class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur"
+      >
+        <Icon name="swords" class="size-4 text-aurora-cyan" />
+        招新进行时 · Join Us
+      </span>
+      <h2 class="mt-6 text-3xl font-bold text-white sm:text-4xl">
+        矢志不退，勇者无畏 —— <br class="hidden sm:block" />
+        <span class="aurora-text">等的就是你</span>
+      </h2>
+      <p class="mt-5 text-lg leading-relaxed text-slate-200/90">
+        无论你来自机械、电控、算法还是运营，只要心怀热爱、敢于挑战，
+        Aurora 战队都为你留有一席之地。加入我们，一起把想法变成赛场上的机甲。
+      </p>
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
+        <Button href="/contact" icon="handshake" size="lg">加入我们</Button>
+        <Button
+          href="/team"
+          variant="outline"
+          size="lg"
+          icon="users"
+          class="!border-white/40 !text-white hover:!border-white hover:!bg-white/10 hover:!text-white"
+        >
+          认识团队
+        </Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

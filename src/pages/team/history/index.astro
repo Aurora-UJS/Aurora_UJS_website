@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/Button.astro";
+import Icon from "@/components/Icon.astro";
+import { link } from "@/lib/utils";
+
+const entries = [
+  {
+    href: "/team/all",
+    title: "所有成员",
+    desc: "Aurora 战队历届全体成员名单，按指导老师、团队负责人与队员分组。",
+    icon: "users",
+  },
+  {
+    href: "/team/23-season",
+    title: "23 赛季成员",
+    desc: "2023 赛季征战 RoboMaster 赛场的参赛阵容。",
+    icon: "swords",
+  },
+];
+---
+
+<BaseLayout
+  title="历届成员"
+  description="按赛季回顾江苏大学 Aurora 战队的历届阵容。"
+>
+  <PageHero
+    icon="users"
+    eyebrow="关于我们"
+    title="历届成员"
+    subtitle="按赛季回顾 Aurora 战队的历届阵容，见证一届届队员的接力与成长。"
+  >
+    <div class="mt-6">
+      <Button href="/team" variant="outline" size="sm" icon="arrow-left">返回当前赛季</Button>
+    </div>
+  </PageHero>
+
+  <Section>
+    <div class="grid gap-5 sm:grid-cols-2">
+      {
+        entries.map((e) => (
+          <a
+            href={link(e.href)}
+            class="card group relative flex items-start gap-4 p-6"
+          >
+            <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-600/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+              <Icon name={e.icon} class="size-6" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <h2 class="flex items-center gap-1.5 text-lg font-bold text-slate-900 transition-colors group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                {e.title}
+                <Icon
+                  name="arrow-right"
+                  class="size-4 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
+                />
+              </h2>
+              <p class="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                {e.desc}
+              </p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+</BaseLayout>
